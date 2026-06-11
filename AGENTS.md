@@ -3,6 +3,16 @@
 You are building a terminal game on top of the rpgkit library. Game code
 only — the engine is a dependency, not your code.
 
+## Every session, in order
+
+1. **Start by reading `docs/status.md`** — it is your memory of everything
+   past sessions did. Trust it over guesses.
+2. Do the task you were given.
+3. **End by updating `docs/status.md`**: refresh "The game right now", move
+   finished items into Implemented, add one Round log line (date — what you
+   did, anything a human had to step in on). Keep every edit short.
+4. Commit everything with a message saying what the round accomplished.
+
 ## Hard rules
 
 1. **Never edit anything under `build/`** — it is generated, including the
