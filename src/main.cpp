@@ -29,6 +29,7 @@ constexpr int kHeroMaxHp = 20;
 constexpr int kGoblinHp = 30;
 constexpr int kClawsDamage = 6;
 constexpr int kEnergyPerTurn = 3;
+constexpr int kMaxEnergy = 5;
 constexpr int kHandSize = 4;
 constexpr int kQuit = -1;
 
@@ -56,6 +57,8 @@ std::vector<Card> cardPool() {
       {.name = "Strike", .cost = 1, .damage = 6, .heal = 0},
       {.name = "Bash", .cost = 2, .damage = 11, .heal = 0},
       {.name = "Salve", .cost = 1, .damage = 0, .heal = 4},
+      {.name = "Smite", .cost = 3, .damage = 16, .heal = 0},
+      {.name = "Vampiric Strike", .cost = 2, .damage = 5, .heal = 3},
   };
 }
 
@@ -138,10 +141,10 @@ int playHealCard(const Card& card, Fighter& target) {
   return resolveHealing(card.name, card.heal, heal);
 }
 
-PhaseResult heroPhase(Fighter& hero, Fighter& goblin, std::mt19937& rng) {
+PhaseResult heroPhase(Fighter& hero, Fighter& goblin, std::mt19937& rng, int& energy) {
   const std::vector<Card> hand = dealHand(rng);
   std::vector<bool> played(hand.size(), false);
-  int energy = kEnergyPerTurn;
+  energy = std::min(energy + kEnergyPerTurn, kMaxEnergy);
 
   while (energy > 0) {
     std::cout << "\nEnergy: " << energy << " | ";
@@ -207,6 +210,7 @@ int main() {
 
   Fighter hero{.name = "Hero", .hp = kHeroMaxHp, .maxHp = kHeroMaxHp};
   Fighter goblin{.name = "Goblin", .hp = kGoblinHp, .maxHp = kGoblinHp};
+  int energy = 0; // starts at zero, gets topped up each turn
 
   std::cout << "A goblin blocks your path!\n";
 
@@ -215,7 +219,7 @@ int main() {
               << hero.name << ": " << hero.hp << "/" << hero.maxHp << " HP  "
               << goblin.name << ": " << goblin.hp << " HP\n";
 
-    const PhaseResult result = heroPhase(hero, goblin, rng);
+    const PhaseResult result = heroPhase(hero, goblin, rng, energy);
 
     if (result == PhaseResult::kQuit) {
       std::cout << "\nYou live to fight another day. The goblin cackles.\n";
