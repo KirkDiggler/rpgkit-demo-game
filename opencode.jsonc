@@ -1,0 +1,80 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  // Project-scoped config: copy of ~/personal/opencode.jsonc. This repo is
+  // its own git project root, so opencode does NOT see the parent dir's
+  // config — without this file, sessions here get no local models and fall
+  // back to the global (paid Bedrock) agents. This repo is the local
+  // model's home turf: sessions here run the "local" agent on qwen.
+  // An agent-level model pin wins over the /models picker — switching
+  // models = switch AGENT (Tab key or /agents), not model.
+  "agent": {
+    // Read-only scout pinned to the SAME local model as the primary —
+    // same loaded weights (no VRAM swap/thrash), but each dispatch gets a
+    // fresh 64k context. Purpose: keep exploration out of the primary
+    // thread so the small window holds design + edits, not file dumps.
+    "scout": {
+      "mode": "subagent",
+      "description": "Read-only codebase exploration: find files, read code, summarize structure. Use for any search or multi-file reading task to keep the main context small.",
+      "model": "ollama/qwen3.6:27b-64k",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
+    },
+    "local": {
+      "mode": "primary",
+      "description": "Local Qwen3 on the 4090 via Ollama",
+      "model": "ollama/qwen3.6:27b-64k",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    }
+  },
+  // Work MCP servers off in personal (matches the ~/projects vs ~/personal
+  // MCP split). Also load-bearing for the local model: their tool defs were
+  // ~20k+ tokens of fixed prompt overhead — enough to blow qwen3's 32k
+  // window before the conversation starts, causing a compaction loop.
+  // chrome-devtools stays (personal-scoped, used for web playtest debugging).
+  "mcp": {
+    "platform-tools": { "enabled": false },
+    "platform-tools-staging": { "enabled": false },
+    "linear": { "enabled": false }
+  },
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (local)",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        // Current pick (June 2026): agentic-coding generation, 17GB Q4,
+        // native 256k ctx. The -64k variant is a Modelfile alias (num_ctx
+        // 65536, same weights). Needs the GPU mostly to itself: with a game
+        // running it spills to CPU and drops to ~4 tok/s — close the game
+        // for local coding sessions, or use the MoE below.
+        "qwen3.6:27b-64k": {
+          "name": "Qwen3.6 27B 64k (local)",
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          }
+        },
+        // MoE: ~5x more tolerant of CPU spill (only 3B active params), so
+        // it's the usable option while a game holds VRAM (~21 tok/s vs the
+        // dense model's ~4). Pick via /models when gaming.
+        "qwen3:30b-a3b": {
+          "name": "Qwen3 30B-A3B (local)",
+          // Ollama serves 32k ctx (OLLAMA_CONTEXT_LENGTH in the systemd
+          // drop-in). Model supports up to 262k but KV cache + 18GB weights
+          // must fit in 24GB VRAM; ~64k is the ceiling before CPU spill.
+          "limit": {
+            "context": 32768,
+            "output": 8192
+          }
+        }
+      }
+    }
+  }
+}
