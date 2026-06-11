@@ -1,24 +1,28 @@
 # Game Status
 
-_Last updated: 2026-06-11 by Claude (setup)_
+_Last updated: 2026-06-11 by Claude (tutorial 03)_
 
 ## The game right now
 
-A playable terminal fight: hero vs goblin, one Strike button, all damage
-through rpgkit chains with the receipt printed every hit. (The tutorial-02
-base game, rebuilt standalone against rpgkit v0.1.0.)
+A deck-builder skeleton: hero gets 4 random cards each turn (Strike/Bash/Salve),
+3 energy budget, healing caps at max HP via chain rules. All damage & healing
+through rpgkit chains with receipts. Goblin at 30 HP, claws for 6 damage.
 
 ## Implemented
 
-- Turn loop: player strikes, goblin claws back, first to 0 HP loses
+- Tutorial 03 deck-builder: Card struct, dealt hand (4 cards), energy system (3/turn)
+- Three card types: Strike (1 cost, 6 dmg), Bash (2 cost, 11 dmg), Salve (1 cost, 4 heal)
+- Healing chain with max-HP cap rule (room = maxHp - hp)
+- Player phase loop: play cards until out of energy or end turn voluntarily
+- Three refusals: invalid card choice, already played, can't afford
+- Turn loop: player phase → goblin claws → check deaths
 - Damage receipts via `rpg::core::Chain<int>` (goblin's tough-skin rule)
 - Safe input reading (bad input re-prompts, EOF quits cleanly)
 - Standalone build: FetchContent pins rpgkit v0.1.0; `make run` plays
 
 ## In progress / next
 
-- Follow rpgkit tutorial 03 (cards & energy): Card struct, dealt hand of 4,
-  3-energy budget, Salve heal chain with max-hp cap
+- (awaiting next tutorial or feature request)
 
 ## Known issues
 
@@ -26,6 +30,10 @@ base game, rebuilt standalone against rpgkit v0.1.0.)
 
 ## Round log
 
+- 2026-06-11: round 3 — implemented tutorial 03 (cards & energy): Card struct,
+  dealHand() with RNG, 3-energy player phase loop, heal chain with max-hp-cap
+  rule, three refusals (invalid/played/can't afford). All tests pass. No
+  interventions needed.
 - 2026-06-11: round 2 — rebuilt the game standalone from the
   start-your-own-game how-to (FetchContent v0.1.0). No interventions needed.
 - 2026-06-10: round 1 — first game built inside the rpgkit clone; finding:
