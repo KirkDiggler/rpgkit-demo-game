@@ -1,4 +1,4 @@
-# rpg-demo-game
+# rpgkit-demo-game
 
 A terminal combat game built on [rpgkit](https://github.com/KirkDiggler/rpgkit),
 and the live artifact of an experiment: **the game-layer code here is written

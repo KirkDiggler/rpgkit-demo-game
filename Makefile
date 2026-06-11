@@ -5,7 +5,7 @@ build:
 	cmake --build build -j
 
 run: build
-	./build/demo_game
+	./build/rpgkit_demo_game
 
 clean:
 	rm -rf build
