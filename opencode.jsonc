@@ -7,7 +7,28 @@
   // model's home turf: sessions here run the "local" agent on qwen.
   // An agent-level model pin wins over the /models picker — switching
   // models = switch AGENT (Tab key or /agents), not model.
+  // Superpowers (global plugin) stays OUT of this repo: qwen's 64k window
+  // can't spare the skills framework overhead — we prompt it well instead.
+  "plugin": [],
   "agent": {
+    // Override the GLOBAL default primary agent (build = Bedrock Opus) so a
+    // session launched here defaults to the local model — no accidental
+    // paid-model runs in qwen's repo. Thinking budget zeroed: that option is
+    // Anthropic-specific and merges in from the global build agent.
+    "build": {
+      "mode": "primary",
+      "model": "ollama/qwen3.6:27b-64k",
+      "options": {
+        "thinking": {
+          "type": "disabled",
+          "budgetTokens": 0
+        }
+      },
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    },
     // Read-only scout pinned to the SAME local model as the primary —
     // same loaded weights (no VRAM swap/thrash), but each dispatch gets a
     // fresh 64k context. Purpose: keep exploration out of the primary
