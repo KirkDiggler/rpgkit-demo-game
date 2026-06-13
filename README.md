@@ -26,6 +26,8 @@ CMakeLists.txt   the whole dependency story: FetchContent + one target
 Makefile         make build / run / clean
 AGENTS.md        rules for the resident model
 ```
+## Screenshots
+<img width="912" height="729" alt="image" src="https://github.com/user-attachments/assets/cfb486ca-6164-4872-b4bc-432027ad1d2c" />
 
 ## License
 
